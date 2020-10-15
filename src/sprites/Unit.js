@@ -2,21 +2,30 @@ import * as GolemClasses from 'golem'
 
 export default class extends Phaser.GameObjects.Sprite {
   constructor(scene, unit) {
-    const { x, y } = unit
+    let { x, y } = unit
+    // tiled offset
+    y -= 10
+
     super(scene, x, y, 'people', 1)
     this.setOrigin(0)
     this.setInteractive()
     this.move = this.move.bind(this)
     this.select = this.select.bind(this)
     this.deselect = this.deselect.bind(this)
+    this.getPath = this.getPath.bind(this)
     this.unit = unit
+    this.coordinate = { x: Math.floor(x / 10), y: Math.floor(y / 10) }
 
     this.deployment = scene.golem.grid.deploy_unit(
       new GolemClasses.Unit({
         team: scene.golem.heroTeam,
-        movement: { steps: 5, unit_pass_through_limit: 0 },
+        movement: {
+          steps: 5,
+          unit_pass_through_limit: 0,
+          can_pass_through_other_unit: false,
+        },
       }),
-      { x: Math.floor(x / 10), y: Math.floor(y / 10) },
+      this.coordinate,
     )
 
     this.on('pointerdown', () => {
@@ -53,8 +62,19 @@ export default class extends Phaser.GameObjects.Sprite {
   }
 
   move(coord) {
+    const timeline = this.scene.tweens.createTimeline()
+    this.getPath(coord).forEach(({ x, y }) =>
+      timeline.add({ targets: this, x: x * 10, y: y * 10, duration: 75 }),
+    )
+    timeline.play()
+
+    this.coordinate = coord
     this.deployment.move([coord])
-    this.setPosition(coord.x * 10, coord.y * 10)
+    this.scene.events.emit('unit_moved', this)
+  }
+
+  getPath(coords) {
+    return [this.coordinate, ...this.deployment.get_route({ to: coords })]
   }
 
   update(time, delta) {}

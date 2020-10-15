@@ -14,6 +14,13 @@ export default class extends Phaser.GameObjects.Sprite {
         y: (this.y + 1) / 10,
       })
     })
+
+    this.on('pointermove', () => {
+      this.scene.events.emit('move_tile_hovered', {
+        x: (this.x + 1) / 10,
+        y: (this.y + 1) / 10,
+      })
+    })
   }
 
   create() {}

@@ -9,6 +9,7 @@ export default class extends Phaser.Scene {
 
   create() {
     this.clearMoveTiles = this.clearMoveTiles.bind(this)
+    this.renderMoveArrow = this.renderMoveArrow.bind(this)
     this.map = this.make.tilemap({ key: 'map' })
     this.tileset = this.map.addTilesetImage('tilemap')
     this.layer = this.map.createDynamicLayer('World', this.tileset, 0, 0)
@@ -16,7 +17,7 @@ export default class extends Phaser.Scene {
     this.golem = new Golem({ map: this.layer.layer.data })
     this.objectGroup = this.add.group()
     this.moveTileGroup = this.add.group()
-
+    this.arrowGraphics = this.add.graphics().setDepth(2)
     this.objLayer.objects.forEach((unit) => {
       this.objectGroup.add(new Unit(this, unit), true)
     })
@@ -38,9 +39,10 @@ export default class extends Phaser.Scene {
     })
 
     this.events.on('unit_deselected', this.clearMoveTiles)
+    this.events.on('unit_selected', (sprite) => (this.selectedUnit = sprite))
+    this.events.on('unit_moved', this.renderMoveArrow)
     this.events.on('move_tile_clicked', this.clearMoveTiles)
-
-    console.log(this.golem.grid)
+    this.events.on('move_tile_hovered', this.renderMoveArrow)
   }
 
   update(time, delta) {
@@ -50,5 +52,24 @@ export default class extends Phaser.Scene {
   clearMoveTiles() {
     this.selectedUnit = null
     this.moveTileGroup.clear(true, true)
+  }
+
+  renderMoveArrow(coords) {
+    this.arrowGraphics.clear()
+    this.arrowGraphics.lineStyle(2, 0xff0000)
+
+    if (!this.selectedUnit) return
+
+    this.selectedUnit.getPath(coords).forEach((point, i, arr) => {
+      const nextPoint = arr[i + 1]
+      if (!nextPoint) return
+
+      this.arrowGraphics.lineBetween(
+        point.x * 10 + 4,
+        point.y * 10 + 5,
+        nextPoint.x * 10 + 4,
+        nextPoint.y * 10 + 5,
+      )
+    })
   }
 }

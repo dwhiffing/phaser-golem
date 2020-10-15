@@ -7,40 +7,49 @@ export default class extends Phaser.GameObjects.Sprite {
     this.setOrigin(0)
     this.setInteractive()
     this.move = this.move.bind(this)
+    this.select = this.select.bind(this)
+    this.deselect = this.deselect.bind(this)
     this.unit = unit
 
     this.deployment = scene.golem.grid.deploy_unit(
       new GolemClasses.Unit({
         team: scene.golem.heroTeam,
-        movement: { steps: 5 },
+        movement: { steps: 5, unit_pass_through_limit: 0 },
       }),
       { x: Math.floor(x / 10), y: Math.floor(y / 10) },
     )
 
     this.on('pointerdown', () => {
-      this.toggleSelect()
+      if (this.selected) {
+        this.deselect()
+      } else {
+        this.select()
+      }
     })
 
     this.scene.events.on('move_tile_clicked', (coord) => {
-      this.move(coord)
-      this.toggleSelect()
+      if (this.selected) {
+        this.move(coord)
+        this.deselect()
+      }
     })
+
+    this.scene.events.on('unit_selected', this.deselect)
   }
 
   create() {}
 
-  toggleSelect() {
-    if (this.selected) {
-      this.clearTint()
-    } else {
-      this.setTintFill(0xff0000)
-    }
-    this.selected = !this.selected
-    if (this.selected) {
-      this.scene.events.emit('unit_selected', this)
-    } else {
-      this.scene.events.emit('unit_deselected')
-    }
+  deselect(sprite) {
+    if (sprite === this) return
+    this.selected = false
+    this.clearTint()
+    this.scene.events.emit('unit_deselected')
+  }
+
+  select() {
+    this.selected = true
+    this.setTintFill(0xff0000)
+    this.scene.events.emit('unit_selected', this)
   }
 
   move(coord) {

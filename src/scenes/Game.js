@@ -30,9 +30,7 @@ export default class extends Phaser.Scene {
     })
 
     this.events.on('unit_selected', (sprite) => {
-      this.selectedUnit = sprite
-      this.moveTileGroup.clear(true)
-      const coords = this.selectedUnit.deployment.reachable_coords()
+      const coords = sprite.deployment.reachable_coords()
       coords.forEach(({ x, y }) => {
         const moveTile = new MoveTile(this, x * 10, y * 10)
         this.moveTileGroup.add(moveTile, true)
@@ -42,9 +40,7 @@ export default class extends Phaser.Scene {
     this.events.on('unit_deselected', this.clearMoveTiles)
     this.events.on('move_tile_clicked', this.clearMoveTiles)
 
-    this.input.on('pointerdown', (pointer) => {
-      // this.selectedUnit = this.selectedUnit ? null : this.selectedUnit
-    })
+    console.log(this.golem.grid)
   }
 
   update(time, delta) {

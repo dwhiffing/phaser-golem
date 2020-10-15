@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="10" tileheight="10" infinite="0" nextlayerid="5" nextobjectid="385">
+<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="10" tileheight="10" infinite="0" nextlayerid="5" nextobjectid="387">
  <editorsettings>
   <export target="map.json" format="json"/>
  </editorsettings>
@@ -64,10 +64,11 @@
 </data>
  </layer>
  <objectgroup id="2" name="Objects">
-  <object id="380" gid="542" x="40" y="100" width="10" height="10"/>
-  <object id="381" gid="542" x="110" y="80" width="10" height="10"/>
-  <object id="382" gid="542" x="80" y="70" width="10" height="10"/>
-  <object id="383" gid="542" x="40" y="60" width="10" height="10"/>
-  <object id="384" gid="952" x="80" y="150" width="10" height="10"/>
+  <object id="380" name="hero" type="unit" gid="1016" x="40" y="50" width="10" height="10"/>
+  <object id="381" name="hero" type="unit" gid="826" x="100" y="50" width="10" height="10"/>
+  <object id="382" name="hero" type="unit" gid="640" x="70" y="40" width="10" height="10"/>
+  <object id="384" name="enemy" type="unit" gid="952" x="60" y="140" width="10" height="10"/>
+  <object id="385" name="enemy" type="unit" gid="952" x="80" y="140" width="10" height="10"/>
+  <object id="386" name="enemy" type="unit" gid="952" x="100" y="140" width="10" height="10"/>
  </objectgroup>
 </map>

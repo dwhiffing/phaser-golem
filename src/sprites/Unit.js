@@ -1,5 +1,7 @@
 import * as GolemClasses from 'golem'
 
+// TODO: clean up events on destroy
+
 export default class extends Phaser.GameObjects.Sprite {
   constructor(scene, unit) {
     let { x, y } = unit
@@ -15,10 +17,28 @@ export default class extends Phaser.GameObjects.Sprite {
     this.getPath = this.getPath.bind(this)
     this.unit = unit
     this.coordinate = { x: Math.floor(x / 10), y: Math.floor(y / 10) }
+    this.team =
+      unit.name === 'hero' ? scene.golem.heroTeam : scene.golem.enemyTeam
+
+    if (unit.name === 'hero') {
+      this.setTintFill(0x0000ff)
+    } else {
+      this.setTintFill(0xff0000)
+    }
+
+    const activeTeam = scene.golem.battle.active_team()
+    this.alpha = !activeTeam || this.team.id === activeTeam.id ? 1 : 0.4
+    this.scene.golem.battle.events.on('nextTurn', (team) => {
+      if (this.team.id === team.id) {
+        this.setAlpha(1)
+        this.canMove = true
+      }
+      this.setAlpha(this.team.id === team.id ? 1 : 0.4)
+    })
 
     this.deployment = scene.golem.grid.deploy_unit(
       new GolemClasses.Unit({
-        team: scene.golem.heroTeam,
+        team: this.team,
         movement: {
           steps: 5,
           unit_pass_through_limit: 0,
@@ -51,14 +71,19 @@ export default class extends Phaser.GameObjects.Sprite {
   deselect(sprite) {
     if (sprite === this) return
     this.selected = false
-    this.clearTint()
+    // this.clearTint()
     this.scene.events.emit('unit_deselected')
   }
 
   select() {
-    this.selected = true
-    this.setTintFill(0xff0000)
-    this.scene.events.emit('unit_selected', this)
+    if (
+      this.scene.golem.battle.active_team().id === this.team.id &&
+      this.canMove
+    ) {
+      this.selected = true
+      // this.setTintFill(0xff0000)
+      this.scene.events.emit('unit_selected', this)
+    }
   }
 
   move(coord) {
@@ -67,10 +92,14 @@ export default class extends Phaser.GameObjects.Sprite {
       timeline.add({ targets: this, x: x * 10, y: y * 10, duration: 75 }),
     )
     timeline.play()
+    timeline.on('complete', () => {
+      this.scene.events.emit('unit_moved', this)
+      this.setAlpha(0.4)
+    })
 
+    this.canMove = false
     this.coordinate = coord
     this.deployment.move([coord])
-    this.scene.events.emit('unit_moved', this)
   }
 
   getPath(coords) {

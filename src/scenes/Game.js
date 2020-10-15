@@ -13,14 +13,19 @@ export default class extends Phaser.Scene {
     this.map = this.make.tilemap({ key: 'map' })
     this.tileset = this.map.addTilesetImage('tilemap')
     this.layer = this.map.createDynamicLayer('World', this.tileset, 0, 0)
+    this.layer.setAlpha(0.6)
     this.objLayer = this.map.getObjectLayer('Objects')
     this.golem = new Golem({ map: this.layer.layer.data })
     this.objectGroup = this.add.group()
     this.moveTileGroup = this.add.group()
     this.arrowGraphics = this.add.graphics().setDepth(2)
-    this.objLayer.objects.forEach((unit) => {
-      this.objectGroup.add(new Unit(this, unit), true)
+    this.objLayer.objects.forEach((object) => {
+      if (object.type === 'unit') {
+        this.objectGroup.add(new Unit(this, object), true)
+      }
     })
+
+    this.golem.battle.advance()
 
     this.cameras.main.setBounds(0, 0, 500, 500)
     const cursors = this.input.keyboard.createCursorKeys()
@@ -39,8 +44,18 @@ export default class extends Phaser.Scene {
     })
 
     this.events.on('unit_deselected', this.clearMoveTiles)
+    this.events.on('unit_deselected', this.renderMoveArrow)
     this.events.on('unit_selected', (sprite) => (this.selectedUnit = sprite))
     this.events.on('unit_moved', this.renderMoveArrow)
+    this.events.on('unit_moved', () => {
+      const activeTeam = this.golem.battle.active_team()
+      const units = this.objectGroup
+        .getChildren()
+        .filter((u) => u.team.id === activeTeam.id)
+      if (units.every((u) => !u.canMove)) {
+        this.golem.battle.advance()
+      }
+    })
     this.events.on('move_tile_clicked', this.clearMoveTiles)
     this.events.on('move_tile_hovered', this.renderMoveArrow)
   }

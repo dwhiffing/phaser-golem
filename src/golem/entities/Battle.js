@@ -13,11 +13,12 @@ class Battle extends Entity {
 
   constructor(
     grid,
-    { end_condition = DEFAULT_END_CONDITION, team_ordering } = {},
+    { end_condition = DEFAULT_END_CONDITION, team_ordering = 'index' } = {},
   ) {
     super({ grid: Grid }, () => {
       this.link_grid(grid)
       this.end_condition = end_condition
+      this.team_ordering = team_ordering
     })
   }
 
@@ -25,12 +26,8 @@ class Battle extends Entity {
     return this.turn_index !== -1 && !this.end_condition(this)
   }
 
-  get team_ordering() {
-    return sortBy(this.grid.teams(), 'id')
-  }
-
   active_team() {
-    const teams = this.team_ordering
+    const teams = sortBy(this.grid.teams(), this.team_ordering)
     let team = teams[this.turn_index % teams.length]
 
     if (!team && teams.length) {

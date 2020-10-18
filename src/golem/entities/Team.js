@@ -11,6 +11,7 @@ class Team extends Entity {
     friendly = [],
     neutral = [],
     wildcard = [],
+    index = 0,
   } = {}) {
     super(
       {
@@ -25,6 +26,8 @@ class Team extends Entity {
           this.switch_parent(parent)
           this.change_relationship(parent, 'friendly')
         }
+
+        this.index = index
 
         hostile.forEach((team) => this.change_relationship(team, 'hostile'))
         friendly.forEach((team) => this.change_relationship(team, 'friendly'))

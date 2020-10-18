@@ -26,8 +26,8 @@ export default class extends Phaser.Scene {
     this.layer = this.map.createDynamicLayer('World', this.tileset, 0, 0)
     this.layer.setAlpha(0.6)
 
-    this.heroTeam = new Team()
-    this.enemyTeam = new Team({ hostile: [this.heroTeam] })
+    this.heroTeam = new Team({ index: 0 })
+    this.enemyTeam = new Team({ index: 1, hostile: [this.heroTeam] })
     this.grid = new Grid({ tiles: createGolemTiles(this.layer.layer.data) })
     this.battle = new Battle(this.grid)
 

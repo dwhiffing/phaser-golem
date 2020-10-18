@@ -15,7 +15,7 @@ export default class extends Phaser.Scene {
     })
 
     this.load.bitmapFont('pixel', 'assets/pixel.png', 'assets/pixel.xml')
-    this.load.tilemapTiledJSON('map', 'assets/maps/map.json')
+    this.load.tilemapTiledJSON('map', 'assets/maps/map2.json')
     this.load.spritesheet('tilemap', 'assets/images/tilemap.png', TILE_DIM)
     this.load.spritesheet('people', 'assets/images/people.png', TILE_DIM)
 

@@ -95,13 +95,11 @@ export default class extends Phaser.GameObjects.Sprite {
     const coords = highlight.getCoord()
     const reachable = this.deployment.targetable_coords()
 
-    console.log({ coords, reachable })
-    debugger
     if (reachable.every((p) => !Coords.match(p, coords))) return
 
     const clickedUnit = this.scene.objectGroup
       .getChildren()
-      .find((o) => o.deployment.tile === highlight.tile)
+      .find((o) => o.deployment.coordinates.match(coords))
 
     this.scene.tweens.add({
       targets: this,

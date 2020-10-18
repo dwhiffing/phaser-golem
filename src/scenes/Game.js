@@ -1,6 +1,7 @@
-import Golem from '../golem'
 import MoveTile from '../sprites/MoveTile'
 import Unit from '../sprites/Unit'
+import { Team, Grid, Battle, create_simple_tileset } from '../golem'
+import { WALL_TILE_INDEXES } from '../constants'
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -15,7 +16,23 @@ export default class extends Phaser.Scene {
     this.layer = this.map.createDynamicLayer('World', this.tileset, 0, 0)
     this.layer.setAlpha(0.6)
     this.objLayer = this.map.getObjectLayer('Objects')
-    this.golem = new Golem({ map: this.layer.layer.data })
+
+    this.heroTeam = new Team()
+    this.enemyTeam = new Team({ hostile: [this.heroTeam] })
+
+    const tiles = create_simple_tileset(50).map((row, y) =>
+      row.map((tile, x) => {
+        const sourceTile = this.layer.layer.data[y][x]
+        const isWall = WALL_TILE_INDEXES.includes(sourceTile.index)
+        tile.cost = isWall ? () => Infinity : () => 1
+        return tile
+      }),
+    )
+
+    this.grid = new Grid({ tiles })
+
+    this.battle = new Battle(this.grid)
+
     this.objectGroup = this.add.group()
     this.moveTileGroup = this.add.group()
     this.arrowGraphics = this.add.graphics().setDepth(2)
@@ -25,7 +42,7 @@ export default class extends Phaser.Scene {
       }
     })
 
-    this.golem.battle.advance()
+    this.battle.advance()
 
     this.cameras.main.setBounds(0, 0, 500, 500)
     const cursors = this.input.keyboard.createCursorKeys()
@@ -48,12 +65,12 @@ export default class extends Phaser.Scene {
     this.events.on('unit_selected', (sprite) => (this.selectedUnit = sprite))
     this.events.on('unit_moved', this.renderMoveArrow)
     this.events.on('unit_moved', () => {
-      const activeTeam = this.golem.battle.active_team()
+      const activeTeam = this.battle.active_team()
       const units = this.objectGroup
         .getChildren()
         .filter((u) => u.team.id === activeTeam.id)
       if (units.every((u) => !u.canMove)) {
-        this.golem.battle.advance()
+        this.battle.advance()
       }
     })
     this.events.on('move_tile_clicked', this.clearMoveTiles)

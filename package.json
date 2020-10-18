@@ -28,8 +28,11 @@
     "webpack-merge": "^5.1.4"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "behavior-system": "^3.0.5",
+    "events": "^3.2.0",
     "lodash": "^4.17.20",
-    "phaser": "^3.24.1"
+    "phaser": "^3.24.1",
+    "uuid": "^8.3.1"
   }
 }

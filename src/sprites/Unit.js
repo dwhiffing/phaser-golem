@@ -1,4 +1,4 @@
-import * as GolemClasses from 'golem'
+import { Unit } from '../golem'
 
 // TODO: clean up events on destroy
 
@@ -17,8 +17,7 @@ export default class extends Phaser.GameObjects.Sprite {
     this.getPath = this.getPath.bind(this)
     this.unit = unit
     this.coordinate = { x: Math.floor(x / 10), y: Math.floor(y / 10) }
-    this.team =
-      unit.name === 'hero' ? scene.golem.heroTeam : scene.golem.enemyTeam
+    this.team = unit.name === 'hero' ? scene.heroTeam : scene.enemyTeam
 
     if (unit.name === 'hero') {
       this.setTintFill(0x0000ff)
@@ -26,9 +25,9 @@ export default class extends Phaser.GameObjects.Sprite {
       this.setTintFill(0xff0000)
     }
 
-    const activeTeam = scene.golem.battle.active_team()
+    const activeTeam = scene.battle.active_team()
     this.alpha = !activeTeam || this.team.id === activeTeam.id ? 1 : 0.4
-    this.scene.golem.battle.events.on('nextTurn', (team) => {
+    this.scene.battle.events.on('nextTurn', (team) => {
       if (this.team.id === team.id) {
         this.setAlpha(1)
         this.canMove = true
@@ -36,8 +35,8 @@ export default class extends Phaser.GameObjects.Sprite {
       this.setAlpha(this.team.id === team.id ? 1 : 0.4)
     })
 
-    this.deployment = scene.golem.grid.deploy_unit(
-      new GolemClasses.Unit({
+    this.deployment = scene.grid.deploy_unit(
+      new Unit({
         team: this.team,
         movement: {
           steps: 5,
@@ -71,17 +70,12 @@ export default class extends Phaser.GameObjects.Sprite {
   deselect(sprite) {
     if (sprite === this) return
     this.selected = false
-    // this.clearTint()
     this.scene.events.emit('unit_deselected')
   }
 
   select() {
-    if (
-      this.scene.golem.battle.active_team().id === this.team.id &&
-      this.canMove
-    ) {
+    if (this.scene.battle.active_team().id === this.team.id && this.canMove) {
       this.selected = true
-      // this.setTintFill(0xff0000)
       this.scene.events.emit('unit_selected', this)
     }
   }

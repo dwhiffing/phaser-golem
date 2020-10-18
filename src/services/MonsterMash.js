@@ -51,17 +51,11 @@ export default class MonsterMash {
     const targetPosition = routeToTarget[routeToTarget.length - 2]
     const unitPosition = routeToTarget[routeToTarget.length - 1]
 
-    // TODO: unit#move should accept coords instead of tile highlights
-    monster.move({ getCoord: () => targetPosition || unitPosition })
+    monster.move(targetPosition || unitPosition)
 
     this.scene.time.addEvent({
       delay: UNIT_MOVE_DURATION,
-      callback: () => {
-        monster.attack({
-          getCoord: () => unitPosition,
-          highlight: { tile: target.deployment.tile },
-        })
-      },
+      callback: () => monster.attack(unitPosition),
     })
   }
 }

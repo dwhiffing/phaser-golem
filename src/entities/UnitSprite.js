@@ -31,10 +31,9 @@ export default class extends Phaser.GameObjects.Sprite {
     this.scene.events.on('tile_highlight_clicked', this.onClickTileHighlight)
   }
 
-  move = (highlight) => {
-    const coord = highlight.getCoord()
+  move = (coords) => {
     const timeline = this.scene.tweens.createTimeline()
-    const path = this.getPath(coord)
+    const path = this.getPath(coords)
     path.forEach(({ x, y }) =>
       timeline.add({
         targets: this,
@@ -50,8 +49,8 @@ export default class extends Phaser.GameObjects.Sprite {
     })
 
     this.canMove = false
-    this.coordinate = coord
-    this.deployment.move([coord])
+    this.coordinate = coords
+    this.deployment.move([coords])
   }
 
   select = () => {
@@ -90,14 +89,13 @@ export default class extends Phaser.GameObjects.Sprite {
     if (!this.selected) return
 
     if (highlight.type === 'move') {
-      this.move(highlight)
+      this.move(highlight.getCoord())
     } else if (highlight.type === 'attack') {
-      this.attack(highlight)
+      this.attack(highlight.getCoord())
     }
   }
 
-  attack = (highlight) => {
-    const coords = highlight.getCoord()
+  attack = (coords) => {
     const reachable = this.deployment.targetable_coords()
 
     this.canAttack = false

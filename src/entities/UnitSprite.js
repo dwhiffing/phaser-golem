@@ -1,5 +1,10 @@
 import { Coords, Unit } from '../golem'
-import { VARIANTS, TILE_SIZE, UNIT_MOVE_DURATION } from '../constants'
+import {
+  VARIANTS,
+  TILE_SIZE,
+  UNIT_MOVE_DURATION,
+  UNIT_ATTACK_DURATION,
+} from '../constants'
 
 export default class extends Phaser.GameObjects.Sprite {
   constructor(scene, unit, variant) {
@@ -10,6 +15,11 @@ export default class extends Phaser.GameObjects.Sprite {
       x: Math.floor(unit.x / TILE_SIZE),
       y: Math.floor((unit.y - TILE_SIZE) / TILE_SIZE),
     }
+
+    // this.scene.add
+    //   .bitmapText(this.x + 12, this.y + 8, 'pixel', '99', 5)
+    //   .setOrigin(1, 0)
+    //   .setDepth(1)
 
     this.setOrigin(0)
       .setInteractive()
@@ -83,7 +93,10 @@ export default class extends Phaser.GameObjects.Sprite {
     ...this.deployment.get_route({ to: coords }),
   ]
 
-  onClick = () => (this.selected ? this.deselect() : this.select())
+  onClick = () => {
+    if (this.team !== this.scene.heroTeam) return
+    this.selected ? this.deselect() : this.select()
+  }
 
   onClickTileHighlight = (highlight) => {
     if (!this.selected) return
@@ -118,7 +131,7 @@ export default class extends Phaser.GameObjects.Sprite {
         this.setAlpha(0.4)
         this.deselect()
       },
-      duration: 150,
+      duration: UNIT_ATTACK_DURATION,
     })
   }
 

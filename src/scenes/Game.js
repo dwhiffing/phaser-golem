@@ -62,6 +62,8 @@ export default class extends Phaser.Scene {
     })
 
     this.events.on('unit_selected', (sprite) => {
+      if (sprite.team !== this.heroTeam) return
+
       this.moveArrow.selectedUnit = sprite
       this.moveArrow.render(sprite)
       if (sprite.canMove) {

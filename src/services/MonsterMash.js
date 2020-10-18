@@ -1,7 +1,7 @@
 import partition from 'lodash/partition'
-import sample from 'lodash/sample'
-import last from 'lodash/last'
-import { UNIT_MOVE_DURATION } from '../constants'
+import findLast from 'lodash/findLast'
+import { UNIT_ATTACK_DURATION, UNIT_MOVE_DURATION } from '../constants'
+import { Coords } from '../golem'
 
 export default class MonsterMash {
   constructor(scene, units) {
@@ -22,11 +22,14 @@ export default class MonsterMash {
     if (isHeroTeam) return
 
     let monsterIndex = 0
+    const monster = this.monsters[monsterIndex]
+    this.mash(monster)
 
     this.loop = this.scene.time.addEvent({
-      delay: 2000,
+      delay: UNIT_MOVE_DURATION + UNIT_ATTACK_DURATION,
       repeat: -1,
       callback: () => {
+        monsterIndex++
         const monster = this.monsters[monsterIndex]
         if (!monster) {
           this.loop.remove()
@@ -34,7 +37,6 @@ export default class MonsterMash {
         }
 
         this.mash(monster)
-        monsterIndex++
       },
     })
   }
@@ -44,18 +46,36 @@ export default class MonsterMash {
   mash = (monster) => {
     if (!monster.active) return
 
-    const target = Phaser.Math.RND.pick(this.heroes)
-    const routeToTarget = monster.deployment.get_route({
-      to: target.deployment.coordinates.raw,
-    })
-    const targetPosition = routeToTarget[routeToTarget.length - 2]
-    const unitPosition = routeToTarget[routeToTarget.length - 1]
+    const closest = this.heroes
+      .filter((h) => h.active)
+      .map((hero) => ({
+        hero,
+        distance: Phaser.Math.Distance.BetweenPoints(
+          monster.deployment.coordinates.raw,
+          hero.deployment.coordinates.raw,
+        ),
+      }))
+      .sort((a, b) => a.distance - b.distance)[0]
 
-    monster.move(targetPosition || unitPosition)
+    if (!closest) return
 
-    this.scene.time.addEvent({
-      delay: UNIT_MOVE_DURATION,
-      callback: () => monster.attack(unitPosition),
-    })
+    const target = closest.hero.deployment.coordinates.raw
+    const reachable = monster.deployment.reachable_coords()
+    const routeToTarget = monster.deployment
+      .get_route({ to: target })
+      .filter((c) => reachable.some((r) => Coords.match(c, r)))
+    const moveCoord = findLast(routeToTarget, (r) => !Coords.match(r, target))
+
+    if (moveCoord) monster.move(moveCoord)
+
+    const targetable = monster.deployment.targetable_coords()
+    if (targetable.some((t) => Coords.match(t, target))) {
+      this.scene.time.addEvent({
+        delay: UNIT_MOVE_DURATION,
+        callback: () => monster.attack(target),
+      })
+    } else {
+      monster.canAttack = false
+    }
   }
 }

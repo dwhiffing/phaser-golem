@@ -22,6 +22,7 @@ export const WALL_TILE_INDEXES = [
 ]
 
 export const UNIT_MOVE_DURATION = 500
+export const UNIT_ATTACK_DURATION = 150
 export const TILE_SIZE = 10
 export const WORLD_TILE_COUNT = 20
 export const WORLD_SIZE = WORLD_TILE_COUNT * TILE_SIZE

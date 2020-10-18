@@ -14,6 +14,10 @@ class Unit extends Entity {
   movement
 
   constructor({
+    attack: {
+      constraint: attackConstraint = new DeltaConstraint(ORTHOGONAL_CONSTRAINT),
+      range: attackRange = 1,
+    } = {},
     movement: {
       constraint = new DeltaConstraint(ORTHOGONAL_CONSTRAINT),
       footprint = new DeltaConstraint([{ x: 0, y: 0 }]),
@@ -25,6 +29,10 @@ class Unit extends Entity {
   }) {
     super({ team: Team, deployment: Deployment }, () => {
       this.switch_team(team)
+      this.attack = {
+        constraint: attackConstraint,
+        range: attackRange,
+      }
       this.movement = {
         can_pass_through_other_unit:
           can_pass_through_other_unit ||

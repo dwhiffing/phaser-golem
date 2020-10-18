@@ -38,20 +38,40 @@ export default class extends Phaser.Scene {
     })
 
     this.moveArrow = new MoveArrow(this)
-
     this.tileHighlighter = new TileHighlighter(this)
-    this.events.on('unit_selected', (sprite) =>
-      this.tileHighlighter.render(sprite.deployment.reachable_coords()),
+
+    this.events.on('tile_highlight_hovered', (highlight) =>
+      this.moveArrow.render(highlight.getCoord()),
     )
-    this.events.on('unit_target_attack', (sprite) => {
+
+    this.events.on('tile_highlight_clicked', () => {
+      this.moveArrow.clear()
       this.tileHighlighter.clear()
+    })
+
+    this.events.on('unit_selected', (sprite) => {
+      this.moveArrow.selectedUnit = sprite
+      this.moveArrow.render(sprite)
+      this.tileHighlighter.render(sprite.deployment.reachable_coords(), 'move')
+    })
+
+    this.events.on('unit_deselected', () => {
+      this.moveArrow.selectedUnit = null
+      this.moveArrow.clear()
+      this.tileHighlighter.clear()
+    })
+
+    this.events.on('unit_moved', () => {
+      this.moveArrow.render()
+      this.checkTurn()
+    })
+
+    this.events.on('unit_target_attack', (sprite) => {
       this.tileHighlighter.render(
         sprite.deployment.targetable_coords(),
-        0xff0000,
+        'attack',
       )
     })
-    this.events.on('unit_deselected', this.tileHighlighter.clear)
-    this.events.on('unit_moved', this.checkTurn)
 
     this.battle.advance()
   }

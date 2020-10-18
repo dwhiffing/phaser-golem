@@ -4,23 +4,10 @@ export default class {
   constructor(scene) {
     this.scene = scene
     this.arrow = this.scene.add.graphics().setDepth(2)
-
-    this.scene.events.on('unit_moved', this.render)
-    this.scene.events.on('move_tile_hovered', this.render)
-
-    this.scene.events.on('unit_selected', (sprite) => {
-      this.selectedUnit = sprite
-      this.render(sprite)
-    })
-
-    this.scene.events.on('unit_deselected', () => {
-      this.selectedUnit = null
-      this.render()
-    })
   }
 
   render = (coords) => {
-    this.arrow.clear().lineStyle(2, 0xff0000)
+    this.clear().lineStyle(2, 0xff0000)
 
     if (!this.selectedUnit || !coords) return
 
@@ -31,4 +18,6 @@ export default class {
       this.arrow.lineBetween(x * ts + 4, y * ts + 5, x2 * ts + 4, y2 * ts + 5)
     })
   }
+
+  clear = () => this.arrow.clear()
 }

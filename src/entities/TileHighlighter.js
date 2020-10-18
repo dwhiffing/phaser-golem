@@ -6,9 +6,16 @@ export default class {
     this.group = this.scene.add.group()
   }
 
-  render = (coords, tint = 0x00ffff) => {
+  render = (coords, type) => {
+    this.clear()
+
+    let tint = 0x00ffff
+    if (type === 'attack') tint = 0xff0000
     coords.forEach(({ x, y }) => {
-      this.group.add(new Highlight(this.scene, x * ts, y * ts, tint), true)
+      this.group.add(
+        new Highlight(this.scene, x * ts, y * ts, type, tint),
+        true,
+      )
     })
   }
 
@@ -18,17 +25,19 @@ export default class {
 }
 
 class Highlight extends Phaser.GameObjects.Sprite {
-  constructor(scene, x, y, tint) {
+  constructor(scene, x, y, type, tint) {
     super(scene, x - 1, y - 1, 'tilemap', 58)
 
     this.setOrigin(0).setInteractive().setAlpha(0.7).setTintFill(tint)
+    this.type = type
+    this.tile = scene.grid.tile_at(this.getCoord())
 
     this.on('pointerdown', () =>
-      scene.events.emit('move_tile_clicked', this.getCoord()),
+      scene.events.emit('tile_highlight_clicked', this),
     )
 
     this.on('pointermove', () =>
-      scene.events.emit('move_tile_hovered', this.getCoord()),
+      scene.events.emit('tile_highlight_hovered', this),
     )
   }
 

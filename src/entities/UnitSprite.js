@@ -23,14 +23,14 @@ export default class extends Phaser.GameObjects.Sprite {
     this.on('pointerdown', this.onClick)
 
     this.scene.battle.events.on('nextTurn', this.onStartTurn)
+
     this.scene.events.on('unit_selected', this.deselect)
-    this.scene.events.on('move_tile_clicked', (coord) => {
-      if (!this.selected) return
-      this.move(coord)
-    })
+
+    this.scene.events.on('tile_highlight_clicked', this.onClickTileHighlight)
   }
 
-  move = (coord) => {
+  move = (highlight) => {
+    const coord = highlight.getCoord()
     const timeline = this.scene.tweens.createTimeline()
     this.getPath(coord).forEach(({ x, y }) =>
       timeline.add({
@@ -43,15 +43,13 @@ export default class extends Phaser.GameObjects.Sprite {
     timeline.play()
     timeline.on('complete', () => {
       this.scene.events.emit('unit_moved', this)
-      this.setAlpha(0.4)
+      this.scene.events.emit('unit_target_attack', this)
     })
 
     this.canMove = false
     this.canAttack = false
     this.coordinate = coord
     this.deployment.move([coord])
-    this.scene.events.emit('unit_target_attack', this)
-    this.deselect()
   }
 
   select = () => {
@@ -82,9 +80,46 @@ export default class extends Phaser.GameObjects.Sprite {
 
   onClick = () => (this.selected ? this.deselect() : this.select())
 
+  onClickTileHighlight = (highlight) => {
+    if (!this.selected) return
+
+    if (highlight.type === 'move') {
+      this.move(highlight)
+    } else if (highlight.type === 'attack') {
+      this.attack(highlight)
+    }
+  }
+
+  attack = (highlight) => {
+    const clickedUnit = this.scene.objectGroup
+      .getChildren()
+      .find((o) => o.deployment.tile === highlight.tile)
+
+    const coord = highlight.getCoord()
+
+    this.scene.tweens.add({
+      targets: this,
+      x: coord.x * TILE_SIZE,
+      y: coord.y * TILE_SIZE,
+      yoyo: true,
+      onComplete: () => {
+        // this.scene.events.emit('unit_attacked', clickedUnit)
+        if (clickedUnit) {
+          clickedUnit.destroy()
+        }
+        this.setAlpha(0.4)
+        this.deselect()
+      },
+      duration: 150,
+    })
+  }
+
   destroy = (fromScene) => {
+    this.scene.events.off('unit_selected', this.deselect)
+    this.scene.events.off('tile_highlight_clicked', this.onClickTileHighlight)
     this.scene.battle.events.off('nextTurn', this.onStartTurn)
-    super.destroy(fromScene)
+    this.scene.grid.withdraw_deployment(this.deployment)
+    super.destroy(true)
   }
 }
 

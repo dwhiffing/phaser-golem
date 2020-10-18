@@ -15,6 +15,8 @@ export default class extends Phaser.GameObjects.Sprite {
       .setInteractive()
       .setTintFill(unit.name === 'hero' ? 0x0000ff : 0xff0000)
 
+    this.setOrigin(-0.1, 0)
+
     this.deployment = scene.grid.deploy_unit(
       new Unit({ team: this.team, ...VARIANTS[variant] }),
       this.coordinate,

@@ -26,7 +26,7 @@ export default class {
 
 class Highlight extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, type, tint) {
-    super(scene, x - 1, y - 1, 'tilemap', 58)
+    super(scene, x, y, 'tilemap', 58)
 
     this.setOrigin(0).setInteractive().setAlpha(0.7).setTintFill(tint)
     this.type = type
@@ -41,5 +41,5 @@ class Highlight extends Phaser.GameObjects.Sprite {
     )
   }
 
-  getCoord = () => ({ x: (this.x + 1) / ts, y: (this.y + 1) / ts })
+  getCoord = () => ({ x: this.x / ts, y: this.y / ts })
 }

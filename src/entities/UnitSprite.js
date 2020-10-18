@@ -44,17 +44,19 @@ export default class extends Phaser.GameObjects.Sprite {
     timeline.play()
     timeline.on('complete', () => {
       this.scene.events.emit('unit_moved', this)
-      this.scene.events.emit('unit_target_attack', this)
+      this.scene.events.emit('unit_selected', this)
     })
 
     this.canMove = false
-    this.canAttack = false
     this.coordinate = coord
     this.deployment.move([coord])
   }
 
   select = () => {
-    if (this.scene.battle.active_team().id === this.team.id && this.canMove) {
+    if (
+      this.scene.battle.active_team().id === this.team.id &&
+      (this.canMove || this.canAttack)
+    ) {
       this.selected = true
       this.scene.events.emit('unit_selected', this)
     }
@@ -70,6 +72,7 @@ export default class extends Phaser.GameObjects.Sprite {
     if (this.team.id === activeTeam.id) {
       this.setAlpha(1)
       this.canMove = true
+      this.canAttack = true
     }
     this.setAlpha(this.team.id === activeTeam.id ? 1 : 0.4)
   }
@@ -95,6 +98,7 @@ export default class extends Phaser.GameObjects.Sprite {
     const coords = highlight.getCoord()
     const reachable = this.deployment.targetable_coords()
 
+    this.canAttack = false
     if (reachable.every((p) => !Coords.match(p, coords))) return
 
     const clickedUnit = this.scene.objectGroup
@@ -107,7 +111,7 @@ export default class extends Phaser.GameObjects.Sprite {
       y: coords.y * TILE_SIZE,
       yoyo: true,
       onComplete: () => {
-        // this.scene.events.emit('unit_attacked', clickedUnit)
+        this.scene.events.emit('unit_moved', this)
         if (clickedUnit) {
           clickedUnit.destroy()
         }

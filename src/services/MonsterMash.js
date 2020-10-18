@@ -42,6 +42,8 @@ export default class MonsterMash {
   addUnit = (unit) => this.units.push(unit)
 
   mash = (monster) => {
+    if (!monster.active) return
+
     const target = Phaser.Math.RND.pick(this.heroes)
     const routeToTarget = monster.deployment.get_route({
       to: target.deployment.coordinates.raw,
@@ -50,7 +52,7 @@ export default class MonsterMash {
     const unitPosition = routeToTarget[routeToTarget.length - 1]
 
     // TODO: unit#move should accept coords instead of tile highlights
-    monster.move({ getCoord: () => targetPosition })
+    monster.move({ getCoord: () => targetPosition || unitPosition })
 
     this.scene.time.addEvent({
       delay: UNIT_MOVE_DURATION,

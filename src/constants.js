@@ -37,7 +37,7 @@ export const VARIANTS = {
       footprint: new DeltaConstraint([{ x: 0, y: 0 }]),
       steps: 8,
       can_pass_through_other_unit: false,
-      unit_pass_through_limit: Infinity,
+      unit_pass_through_limit: 0,
     },
   },
   mage: {
@@ -53,7 +53,7 @@ export const VARIANTS = {
       footprint: new DeltaConstraint([{ x: 0, y: 0 }]),
       steps: 8,
       can_pass_through_other_unit: false,
-      unit_pass_through_limit: Infinity,
+      unit_pass_through_limit: 0,
     },
   },
 }

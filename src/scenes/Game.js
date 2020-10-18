@@ -15,6 +15,8 @@ export default class extends Phaser.Scene {
   }
 
   create() {
+    this.input.mouse.disableContextMenu()
+
     this.controls = new Phaser.Cameras.Controls.FixedKeyControl({
       ...this.input.keyboard.createCursorKeys(),
       camera: this.cameras.main.setBounds(0, 0, WORLD_SIZE, WORLD_SIZE),
@@ -42,6 +44,14 @@ export default class extends Phaser.Scene {
     this.moveArrow = new MoveArrow(this)
     this.tileHighlighter = new TileHighlighter(this)
 
+    this.input.on('pointerdown', (pointer) => {
+      if (pointer.rightButtonDown()) {
+        if (this.moveArrow.selectedUnit) {
+          this.moveArrow.selectedUnit.deselect()
+        }
+      }
+    })
+
     this.events.on('tile_highlight_hovered', (highlight) =>
       this.moveArrow.render(highlight.getCoord()),
     )
@@ -54,7 +64,17 @@ export default class extends Phaser.Scene {
     this.events.on('unit_selected', (sprite) => {
       this.moveArrow.selectedUnit = sprite
       this.moveArrow.render(sprite)
-      this.tileHighlighter.render(sprite.deployment.reachable_coords(), 'move')
+      if (sprite.canMove) {
+        this.tileHighlighter.render(
+          sprite.deployment.reachable_coords(),
+          'move',
+        )
+      } else {
+        this.tileHighlighter.render(
+          sprite.deployment.targetable_coords(),
+          'attack',
+        )
+      }
     })
 
     this.events.on('unit_deselected', () => {
@@ -66,13 +86,6 @@ export default class extends Phaser.Scene {
     this.events.on('unit_moved', () => {
       this.moveArrow.render()
       this.checkTurn()
-    })
-
-    this.events.on('unit_target_attack', (sprite) => {
-      this.tileHighlighter.render(
-        sprite.deployment.targetable_coords(),
-        'attack',
-      )
     })
 
     this.battle.advance()

@@ -37,8 +37,8 @@
   <object id="380" name="hero" type="unit" gid="1016" x="90" y="160" width="10" height="10"/>
   <object id="381" name="hero" type="unit" gid="826" x="80" y="150" width="10" height="10"/>
   <object id="382" name="hero" type="unit" gid="640" x="70" y="160" width="10" height="10"/>
-  <object id="384" name="enemy" type="unit" gid="952" x="100" y="30" width="10" height="10"/>
-  <object id="385" name="enemy" type="unit" gid="952" x="60" y="30" width="10" height="10"/>
-  <object id="386" name="enemy" type="unit" gid="952" x="80" y="30" width="10" height="10"/>
+  <object id="384" name="enemy" type="unit" gid="952" x="80" y="70" width="10" height="10"/>
+  <object id="385" name="enemy" type="unit" gid="952" x="80" y="50" width="10" height="10"/>
+  <object id="386" name="enemy" type="unit" gid="952" x="80" y="90" width="10" height="10"/>
  </objectgroup>
 </map>

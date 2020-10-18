@@ -1,3 +1,5 @@
+import { TILE_SIZE } from '../constants'
+
 export default class extends Phaser.Scene {
   constructor() {
     super({ key: 'Boot' })
@@ -6,30 +8,16 @@ export default class extends Phaser.Scene {
   preload() {
     const progress = this.add.graphics()
     this.load.on('progress', (value) => {
+      const { width, height } = this.sys.game.config
       progress.clear()
       progress.fillStyle(0xffffff, 1)
-      progress.fillRect(
-        0,
-        0,
-        this.sys.game.config.width * value,
-        this.sys.game.config.height,
-      )
+      progress.fillRect(0, 0, width * value, height)
     })
 
-    this.load.bitmapFont(
-      'pixel-dan',
-      'assets/pixel-dan.png',
-      'assets/pixel-dan.xml',
-    )
+    this.load.bitmapFont('pixel', 'assets/pixel.png', 'assets/pixel.xml')
     this.load.tilemapTiledJSON('map', 'assets/maps/map.json')
-    this.load.spritesheet('tilemap', 'assets/images/tilemap.png', {
-      frameWidth: 10,
-      frameHeight: 10,
-    })
-    this.load.spritesheet('people', 'assets/images/people.png', {
-      frameWidth: 10,
-      frameHeight: 10,
-    })
+    this.load.spritesheet('tilemap', 'assets/images/tilemap.png', TILE_DIM)
+    this.load.spritesheet('people', 'assets/images/people.png', TILE_DIM)
 
     this.load.on('complete', () => {
       progress.destroy()
@@ -37,3 +25,5 @@ export default class extends Phaser.Scene {
     })
   }
 }
+
+const TILE_DIM = { frameWidth: TILE_SIZE, frameHeight: TILE_SIZE }

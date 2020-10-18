@@ -9,13 +9,8 @@ const game = new Phaser.Game({
   height: 250,
   pixelArt: true,
   zoom: 10,
-  input: {
-    activePointers: 3,
-  },
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
+  input: { activePointers: 3 },
+  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: Object.values(scenes),
 })
 

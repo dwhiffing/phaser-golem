@@ -33,7 +33,7 @@ export default class extends Phaser.Scene {
     this.objectGroup = this.add.group()
     this.map.getObjectLayer('Objects').objects.forEach((object) => {
       if (object.type === 'unit') {
-        this.objectGroup.add(new UnitSprite(this, object), true)
+        this.objectGroup.add(new UnitSprite(this, object, 'mage'), true)
       }
     })
 

@@ -3,7 +3,7 @@ import DeltaConstraint from '../utils/DeltaConstraint'
 import Team from './Team'
 import Deployment from './Deployment'
 
-const ORTHOGONAL_CONSTRAINT = [
+export const ORTHOGONAL_CONSTRAINT = [
   { x: -1, y: 0 },
   { x: 1, y: 0 },
   { x: 0, y: 1 },

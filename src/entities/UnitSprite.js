@@ -1,8 +1,8 @@
 import { Unit } from '../golem'
-import { TILE_SIZE } from '../constants'
+import { CLASSES, TILE_SIZE } from '../constants'
 
 export default class extends Phaser.GameObjects.Sprite {
-  constructor(scene, unit) {
+  constructor(scene, unit, variant) {
     super(scene, unit.x, unit.y - TILE_SIZE, 'people', 1)
     this.unit = unit
     this.team = unit.name === 'hero' ? scene.heroTeam : scene.enemyTeam
@@ -16,7 +16,7 @@ export default class extends Phaser.GameObjects.Sprite {
       .setTintFill(unit.name === 'hero' ? 0x0000ff : 0xff0000)
 
     this.deployment = scene.grid.deploy_unit(
-      new Unit({ team: this.team, movement: UNIT_MOVEMENT }),
+      new Unit({ team: this.team, ...CLASSES[variant] }),
       this.coordinate,
     )
 

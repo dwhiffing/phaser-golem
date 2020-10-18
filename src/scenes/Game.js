@@ -66,11 +66,10 @@ export default class extends Phaser.Scene {
 
       this.moveArrow.selectedUnit = sprite
       this.moveArrow.render(sprite)
+      const reachable = sprite.deployment.reachable_coords()
+      if (reachable.length === 0) sprite.canMove = false
       if (sprite.canMove) {
-        this.tileHighlighter.render(
-          sprite.deployment.reachable_coords(),
-          'move',
-        )
+        this.tileHighlighter.render(reachable, 'move')
       } else {
         this.tileHighlighter.render(
           sprite.deployment.targetable_coords(),

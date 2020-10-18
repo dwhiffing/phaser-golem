@@ -16,10 +16,14 @@ export default class extends Phaser.GameObjects.Sprite {
       y: Math.floor((unit.y - TILE_SIZE) / TILE_SIZE),
     }
 
-    // this.scene.add
-    //   .bitmapText(this.x + 12, this.y + 8, 'pixel', '99', 5)
-    //   .setOrigin(1, 0)
-    //   .setDepth(1)
+    const stats = VARIANTS[variant]
+
+    this.health = stats.health || 9
+    this.damage = stats.damage || 1
+    this.healthText = this.scene.add
+      .bitmapText(this.x, this.y, 'pixel', this.health.toString(), 5)
+      .setOrigin(1, 0)
+      .setDepth(1)
 
     this.setOrigin(0)
       .setInteractive()
@@ -28,7 +32,7 @@ export default class extends Phaser.GameObjects.Sprite {
     this.setOrigin(-0.1, 0)
 
     this.deployment = scene.grid.deploy_unit(
-      new Unit({ team: this.team, ...VARIANTS[variant] }),
+      new Unit({ team: this.team, ...stats }),
       this.coordinate,
     )
 
@@ -46,7 +50,7 @@ export default class extends Phaser.GameObjects.Sprite {
     const path = this.getPath(coords)
     path.forEach(({ x, y }) =>
       timeline.add({
-        targets: this,
+        targets: [this, this.healthText],
         x: x * TILE_SIZE,
         y: y * TILE_SIZE,
         duration: UNIT_MOVE_DURATION / path.length,
@@ -119,14 +123,14 @@ export default class extends Phaser.GameObjects.Sprite {
       .find((o) => o.deployment.coordinates.match(coords))
 
     this.scene.tweens.add({
-      targets: this,
+      targets: [this, this.healthText],
       x: coords.x * TILE_SIZE,
       y: coords.y * TILE_SIZE,
       yoyo: true,
       onComplete: () => {
         this.scene.events.emit('unit_moved', this)
         if (clickedUnit) {
-          clickedUnit.destroy()
+          clickedUnit.takeDamage(this.damage)
         }
         this.setAlpha(0.4)
         this.deselect()
@@ -135,7 +139,17 @@ export default class extends Phaser.GameObjects.Sprite {
     })
   }
 
-  destroy = (fromScene) => {
+  takeDamage = (amount) => {
+    this.health -= amount
+    if (this.health <= 0) {
+      this.health = 0
+      this.destroy()
+    }
+
+    this.healthText.setText(this.health.toString())
+  }
+
+  destroy = () => {
     this.scene.events.off('unit_selected', this.deselect)
     this.scene.events.off('tile_highlight_clicked', this.onClickTileHighlight)
     this.scene.battle.events.off('nextTurn', this.onStartTurn)

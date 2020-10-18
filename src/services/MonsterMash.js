@@ -67,6 +67,7 @@ export default class MonsterMash {
     const moveCoord = findLast(routeToTarget, (r) => !Coords.match(r, target))
 
     if (moveCoord) monster.move(moveCoord)
+    monster.canMove = false
 
     const targetable = monster.deployment.targetable_coords()
     if (targetable.some((t) => Coords.match(t, target))) {
@@ -74,8 +75,7 @@ export default class MonsterMash {
         delay: UNIT_MOVE_DURATION,
         callback: () => monster.attack(target),
       })
-    } else {
-      monster.canAttack = false
     }
+    monster.canAttack = false
   }
 }

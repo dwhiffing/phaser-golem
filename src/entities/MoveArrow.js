@@ -15,7 +15,7 @@ export default class {
       if (!arr[i + 1]) return
 
       const { x: x2, y: y2 } = arr[i + 1]
-      this.arrow.lineBetween(x * ts + 4, y * ts + 5, x2 * ts + 4, y2 * ts + 5)
+      this.arrow.lineBetween(x * ts + 5, y * ts + 5, x2 * ts + 5, y2 * ts + 5)
     })
   }
 

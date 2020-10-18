@@ -19,5 +19,5 @@ export const WALL_TILE_INDEXES = [
 ]
 
 export const TILE_SIZE = 10
-export const WORLD_TILE_COUNT = 50
+export const WORLD_TILE_COUNT = 20
 export const WORLD_SIZE = WORLD_TILE_COUNT * TILE_SIZE

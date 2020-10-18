@@ -1,4 +1,4 @@
-import UnitSprite from '../sprites/Unit'
+import UnitSprite from '../sprites/UnitSprite'
 import { Team, Grid, Battle } from '../golem'
 import { WORLD_SIZE } from '../constants'
 import MovementInput from '../utils/MovementInput'

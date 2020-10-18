@@ -87,7 +87,7 @@ export default class extends Phaser.GameObjects.Sprite {
 }
 
 const UNIT_MOVEMENT = {
-  steps: 5,
+  steps: 6,
   unit_pass_through_limit: 0,
   can_pass_through_other_unit: false,
 }

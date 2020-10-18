@@ -1,6 +1,7 @@
 import UnitSprite from '../entities/UnitSprite'
 import TileHighlighter from '../entities/TileHighlighter'
 import MoveArrow from '../entities/MoveArrow'
+import MonsterMash from '../services/MonsterMash'
 import { Team, Grid, Battle } from '../golem'
 import { createGolemTiles } from '../utils/createGolemTiles'
 import { WORLD_SIZE } from '../constants'
@@ -33,10 +34,11 @@ export default class extends Phaser.Scene {
     this.objectGroup = this.add.group()
     this.map.getObjectLayer('Objects').objects.forEach((object) => {
       if (object.type === 'unit') {
-        this.objectGroup.add(new UnitSprite(this, object, 'mage'), true)
+        this.objectGroup.add(new UnitSprite(this, object, 'base'), true)
       }
     })
 
+    this.monsterMash = new MonsterMash(this)
     this.moveArrow = new MoveArrow(this)
     this.tileHighlighter = new TileHighlighter(this)
 

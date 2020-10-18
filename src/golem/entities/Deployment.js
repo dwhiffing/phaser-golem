@@ -245,12 +245,15 @@ class Deployment extends Entity {
           return acc
         }
 
-        const did_pass_through_units = deployments.reduce((acc, deployment) => {
-          if (acc === false) return false
-          const can_pass = can_pass_through_other_unit(deployment.unit)
-          if (!can_pass) acc.inaccessible.add(coordinates.hash)
-          return can_pass
-        }, undefined)
+        const did_pass_through_units = deployments.reduce(
+          (temp, deployment) => {
+            if (temp === false) return false
+            const can_pass = can_pass_through_other_unit(deployment.unit)
+            if (!can_pass) acc.inaccessible.add(coordinates.hash)
+            return can_pass
+          },
+          undefined,
+        )
 
         if (did_pass_through_units === true) {
           acc.pass_through_count += deployments.length

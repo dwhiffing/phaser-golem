@@ -1,5 +1,5 @@
-import { Unit } from '../golem'
-import { CLASSES, TILE_SIZE } from '../constants'
+import { Coords, Unit } from '../golem'
+import { VARIANTS, TILE_SIZE, UNIT_MOVE_DURATION } from '../constants'
 
 export default class extends Phaser.GameObjects.Sprite {
   constructor(scene, unit, variant) {
@@ -16,7 +16,7 @@ export default class extends Phaser.GameObjects.Sprite {
       .setTintFill(unit.name === 'hero' ? 0x0000ff : 0xff0000)
 
     this.deployment = scene.grid.deploy_unit(
-      new Unit({ team: this.team, ...CLASSES[variant] }),
+      new Unit({ team: this.team, ...VARIANTS[variant] }),
       this.coordinate,
     )
 
@@ -32,12 +32,13 @@ export default class extends Phaser.GameObjects.Sprite {
   move = (highlight) => {
     const coord = highlight.getCoord()
     const timeline = this.scene.tweens.createTimeline()
-    this.getPath(coord).forEach(({ x, y }) =>
+    const path = this.getPath(coord)
+    path.forEach(({ x, y }) =>
       timeline.add({
         targets: this,
         x: x * TILE_SIZE,
         y: y * TILE_SIZE,
-        duration: 75,
+        duration: UNIT_MOVE_DURATION / path.length,
       }),
     )
     timeline.play()
@@ -91,16 +92,21 @@ export default class extends Phaser.GameObjects.Sprite {
   }
 
   attack = (highlight) => {
+    const coords = highlight.getCoord()
+    const reachable = this.deployment.targetable_coords()
+
+    console.log({ coords, reachable })
+    debugger
+    if (reachable.every((p) => !Coords.match(p, coords))) return
+
     const clickedUnit = this.scene.objectGroup
       .getChildren()
       .find((o) => o.deployment.tile === highlight.tile)
 
-    const coord = highlight.getCoord()
-
     this.scene.tweens.add({
       targets: this,
-      x: coord.x * TILE_SIZE,
-      y: coord.y * TILE_SIZE,
+      x: coords.x * TILE_SIZE,
+      y: coords.y * TILE_SIZE,
       yoyo: true,
       onComplete: () => {
         // this.scene.events.emit('unit_attacked', clickedUnit)
@@ -121,10 +127,4 @@ export default class extends Phaser.GameObjects.Sprite {
     this.scene.grid.withdraw_deployment(this.deployment)
     super.destroy(true)
   }
-}
-
-const UNIT_MOVEMENT = {
-  steps: 8,
-  unit_pass_through_limit: 0,
-  can_pass_through_other_unit: false,
 }

@@ -1,9 +1,13 @@
-import UnitSprite from '../sprites/UnitSprite'
+import UnitSprite from '../entities/UnitSprite'
+import TileHighlighter from '../entities/TileHighlighter'
+import MoveArrow from '../entities/MoveArrow'
 import { Team, Grid, Battle } from '../golem'
-import { WORLD_SIZE } from '../constants'
-import MovementInput from '../utils/MovementInput'
 import { createGolemTiles } from '../utils/createGolemTiles'
+import { WORLD_SIZE } from '../constants'
 
+// Undo button
+// End turn button
+// attack button
 export default class extends Phaser.Scene {
   constructor() {
     super({ key: 'Game' })
@@ -33,7 +37,20 @@ export default class extends Phaser.Scene {
       }
     })
 
-    this.movementInput = new MovementInput(this)
+    this.moveArrow = new MoveArrow(this)
+
+    this.tileHighlighter = new TileHighlighter(this)
+    this.events.on('unit_selected', (sprite) =>
+      this.tileHighlighter.render(sprite.deployment.reachable_coords()),
+    )
+    this.events.on('unit_target_attack', (sprite) => {
+      this.tileHighlighter.clear()
+      this.tileHighlighter.render(
+        sprite.deployment.targetable_coords(),
+        0xff0000,
+      )
+    })
+    this.events.on('unit_deselected', this.tileHighlighter.clear)
     this.events.on('unit_moved', this.checkTurn)
 
     this.battle.advance()
@@ -46,7 +63,11 @@ export default class extends Phaser.Scene {
   getActiveUnits = () =>
     this.objectGroup
       .getChildren()
-      .filter((u) => u.team.id === this.battle.active_team().id && u.canMove)
+      .filter(
+        (u) =>
+          u.team.id === this.battle.active_team().id &&
+          (u.canMove || u.canAttack),
+      )
 
   checkTurn = () => {
     if (this.getActiveUnits().length === 0) {

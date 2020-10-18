@@ -61,6 +61,15 @@ class Deployment extends Entity {
       [Coords.hash(from), this.grid.id, this.grid.timestamp].join(),
   )
 
+  targetable_coords = memoize(
+    (from = this.coordinates.raw) =>
+      this.apply_movement_options(from, 1).map(
+        (hash) => Coords.parse(hash).raw,
+      ),
+    (from = this.coordinates.raw) =>
+      [Coords.hash(from), this.grid.id, this.grid.timestamp].join(),
+  )
+
   move = (path) => {
     if (path.length < 1) {
       console.error(

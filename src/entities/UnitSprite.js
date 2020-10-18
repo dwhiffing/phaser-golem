@@ -47,8 +47,10 @@ export default class extends Phaser.GameObjects.Sprite {
     })
 
     this.canMove = false
+    this.canAttack = false
     this.coordinate = coord
     this.deployment.move([coord])
+    this.scene.events.emit('unit_target_attack', this)
     this.deselect()
   }
 
@@ -87,7 +89,7 @@ export default class extends Phaser.GameObjects.Sprite {
 }
 
 const UNIT_MOVEMENT = {
-  steps: 6,
+  steps: 8,
   unit_pass_through_limit: 0,
   can_pass_through_other_unit: false,
 }

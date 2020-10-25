@@ -117,12 +117,21 @@ export default class extends Phaser.GameObjects.Sprite {
     const clickedUnit = this.scene.objectGroup
       .getChildren()
       .find((o) => o.deployment.coordinates.match(coords))
-
+    
+    let text;
     this.scene.tweens.add({
       targets: this,
       x: coords.x * TILE_SIZE,
       y: coords.y * TILE_SIZE,
       yoyo: true,
+      onStart: () =>{
+        text = this.scene.add.text(
+          (coords.x + 1) * TILE_SIZE,
+          coords.y * TILE_SIZE,
+          'Have at thee!',
+          {font: `${TILE_SIZE}px`}
+        )
+      },
       onComplete: () => {
         this.scene.events.emit('unit_moved', this)
         if (clickedUnit) {
@@ -130,6 +139,7 @@ export default class extends Phaser.GameObjects.Sprite {
         }
         this.setAlpha(0.4)
         this.deselect()
+        text.destroy()
       },
       duration: UNIT_ATTACK_DURATION,
     })

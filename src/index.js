@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'
 import Phaser from 'phaser'
 import * as scenes from './scenes'
 
